@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+<link href="https://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.min.js" integrity="sha512-jWNpWAWx86B/GZV4Qsce63q5jxx/rpWnw812vh0RE+SBIo/mmepwOSQkY2eVQnMuE28pzUEO7ux0a5sJX91g8A==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.7.0/nouislider.css" integrity="sha512-zK13DHt+RvOBWVI7UsG9euzg5sl1QUhJKZVu20rrvPLaTito+K9elJBtEPWi3YJ+O6o5tYp6cdOc4lN9ePm9Lw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+<style>
+
+#cut-left{
+	//background:#337ab7;
+}
+#cut-right{
+	//background:#337ab7;
+	//direction:rtl;
+	//margin-left: 100%;
+	//transform:rotate(180deg)
+}
+
+
+.progress {
+    border-radius: 0px; 
+    height: 80px;
+	opacity:0.6;
+	margin-top:-84px;
+}
+
+.progress-bar-warning{
+    background: none;
+}
+
+.video-image-size-onWatch{
+    width:150px;
+    height:auto;
+}
+
+#showcase {
+    margin: 0 20px;
+    text-align: center;
+}
+#range .noUi-base {
+    
+}
+#range .noUi-background {
+    
+}
+#range .noUi-connect {
+    background: #80C9F5;
+    box-shadow: inset 0 0 5px rgba(20,20,20,0.65);
+}
+
+#value-span,
+#value-input {
+    width: 50%;
+    float: left;
+    display: block;
+    text-align: center;
+    margin: 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+html, body {
+  width:  100%;
+  height: 100%;
+  margin: 0;
+}
+
+:root {
+  --youtube-red: #ffffff;
+}
+.video-progress {
+  position: relative;
+  height: 8.4px;
+  margin-bottom: 10px;
+}
+
+.volumeslider {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  cursor: pointer;
+  margin: 0;
+}
+
+.volumeslider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 80px;
+  background: #d3d3d3;
+  outline: none;
+  //z-index:-99;
+  opacity: 0;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.volumeslider::-moz-range-thumb {
+  width: 25px;
+  height: 25px;
+  background: #04AA6D;
+  cursor: pointer;
+}
+.volumecontainer{
+	width:100%;
+	position:relative;
+}
+.explore_area{
+	position:relative;
+	z-index:-99;
+}
+
+
+
+//start filter css
+/* Create two equal columns that floats next to each other */
+.columnn {
+  float: left;
+  width: 20%;
+  cursor:pointer;
+  padding: 5px;
+  border:1px solid black;
+  font-size:14px;
+  height: auto; /* Should be removed. Only for demonstration */
+}
+
+.color {
+  float: left;
+  width: 20%;
+  cursor:pointer;
+  text-align:center;
+//  padding: 5px;
+ // border:1px solid black;
+  font-size:14px;
+  height: auto; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+.video-container {
+position: relative;
+margin: 0px auto 0;
+}
+
+.video-container .video-filter {
+position: absolute;
+top: 0;
+width: 100%;
+height: 100%;
+z-index: 9999;
+pointer-events: none; /*Unofficial and Won't Validate*/
+background-color: rgba(50,100,200,.5)
+}
+
+
+
+.row .green {
+background-color: #00FF00;
+}
+.row .red {
+background-color: #FF0000;
+}
+.row .blue {
+background-color: #0000FF;
+}
+.row .yellow {
+background-color: #FFFF00;
+}
+.row .clear {
+background-color: #fff;
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+border: 1px solid rgba(0,0,0,.1);
+}
+
+.video-container .video-filter-controls span {
+display: block;
+width: 100%;
+height: 20px;
+}
+
+.progresser{
+transform:rotate(180deg);
+}
+.separa{
+    margin-left: 10px;
+    margin-right: 10px;
+	text-decoration:none;
+}
+.separa:hover{
+	text-decoration:none;
+}
+
+
+</style>
+</head>
+<body>
+<div>
+<!--width="540" height="400"-->
+<input style="padding:10px;" type="file" name="file" accept="video/*" class="file_multi_video custom-video-input" /></div>
+<video class="vid" id="video" autoplay>
+<source src="" id="videohere" type="video/mp4">
+</video>
+	<div id="volumecontainer" class="volumecontainer" style="display:none;">
+		<canvas width="" class="explore_area" height="80px" id="prevImgCanvas">Your browser does not support the HTML5 canvas tag.</canvas>
+		 <!-- progress bar -->
+		  <div class="progress">
+			<div class="progress-bar progress-bar-primary progress-bar-striped" id="cut-left" style="width: 0%">
+			  <span class="sr-only"></span>
+			</div>
+			<div class="progress-bar progress-bar-success progress-bar-striped active" id="played" style="width: 0%">
+			  <span class="sr-only"></span>
+			</div>
+			<div class="progress-bar progress-bar-warning progress-bar-striped" id="toPlay" style="width: 100%">
+			  <span class="sr-only"></span>
+			</div>
+			 
+			<div class="progress-bar progress-bar-primary progress-bar-striped" id="cut-right" style="width: 0%">
+			  <span class="sr-only"></span>
+			</div>
+			<!--<div class="progresser progress">
+			</div>-->
+		  </div>
+		 
+		<!--<progress class="progress-barleft" id="progress-barleft" value="0" min="0" style="background:#bd1e1e45; width:0%;"></progress>
+		<progress class="progress-bar" id="progress-bar" value="0" min="0"></progress>
+		<progress class="progress-barright" id="progress-barright" value="0" min="0" style="background:#bd1e1e45;  width:0%;"></progress>-->
+		<input type="range" min="1" max="" value="0" step="1" class="volumeslider" id="volumeRange">
+		<div id="range"></div>
+		<div id="value-input"></div>
+		<div id="value-span"></div>
+		 <!-- Controls -->
+  <div id="controls" style="padding-top:20px; font-size: 2em; text-align:center;">
+    <!--<a href="#" onClick="rewindVideo()" class="separa">
+      <i class="separa icon-refresh"></i>
+    </a>-->
+
+    <a onClick="backwardVideo()" class="separa">
+      <i class="separa icon-backward"></i>
+    </a>
+    <a onClick="playPauseVideo()" id="playPause" class="separa">
+      <i class="separa icon-pause"></i>
+    </a>
+    <a onClick="forwardVideo()" class="separa">
+      <i class="separa icon-forward"></i>
+    </a>
+  </div>
+	</div>
+	
+	 <!-- 2. The IONrangeSlider container -->
+	
+<input  id="audioinput" style="padding:10px; display:none;" class="custom-audio-input" type="file" name="file" accept="audio/*" /></div>
+<audio id="audio" autoplay loop>	
+  <source src="" id="audiohere" type="audio/mpeg">
+</audio>	
+<a href="#" class"removeaudio" id="removeaudio" style="color:red; display:none;" >Remove Music</a>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script>
+$(document).on("change", ".file_multi_video", function(evt) {
+  var $source = $('#videohere');
+  $source[0].src = URL.createObjectURL(this.files[0]);
+  $source.parent()[0].load();
+});
+let x = -1;
+let y = 0;
+var video = document.createElement("video");
+  var widthcan;
+  var widthcancheck;
+  var audloop;
+var canvas = document.getElementById("prevImgCanvas");
+canvas.width = window.innerWidth - 20;
+
+video.addEventListener('loadeddata', function() {
+	//delete window.setIONrangeSlider;
+		//callbacks.remove(  );
+	widthcancheck = canvas.width / video.duration;
+	if(widthcancheck > video.duration/4){
+		 widthcan = canvas.width / 1000;
+	}
+	else{
+	widthcan = canvas.width / video.duration;
+	}
+	//widthcan = canvas.width / video.duration;
+	$('.video-container').css({
+		'width':$('.video-container video').width(),
+		'height':$('.video-container video').height()
+	});
+	reloadRandomFrame();
+	var fromOld = 0;
+	var vid = document.getElementById('video');
+	var toOld = vid.duration;
+	var slider;
+//function setIONrangeSlider(){
+	setIONrangeSlider();
+	var rand = (Math.round(video.duration * 70) + 1) / 1000;
+	$("#volumeRange").attr("max",Math.floor(video.duration));
+	$("#progress-bar").attr("max",Math.floor(video.duration));
+	
+}, false);
+  
+	widthcancheck = canvas.width / video.duration;
+	if(widthcancheck > video.duration){
+		 widthcan = canvas.width / 1000;
+	}
+	else{
+	widthcan = canvas.width / video.duration;
+	}
+	
+video.addEventListener('seeked', function() {
+	x = x+1;
+	var context = canvas.getContext('2d');
+	let frame = (canvas.width * widthcan) / video.duration;
+	y = x * frame;
+	context.drawImage(video, y, 0, frame, 80);
+	reloadRandomFrame();
+	//checkDomainAndStop();
+	// updatePlayerBar();
+	var vid = document.getElementById("video");
+	var aud = document.getElementById("audio");
+	$("#volumeRange").attr("value",Math.floor(vid.currentTime));
+	$("#progress-bar").attr("value",Math.floor(vid.currentTime));
+	//audloop = vid.duration / aud.duration;
+	if(vid.duration == vid.currentTime){
+		aud.pause();
+	}else{
+		//aud.play();
+		//vid.play();
+	}
+	
+}, false);
+
+var playSelectedFile = function(event) {
+	x = -1;
+	y = 0;
+	var file = this.files[0];
+	var fileURL = URL.createObjectURL(file);
+	video.src = fileURL;
+	document.getElementById('filtercolor').style.display = "block";
+	document.getElementById('volumecontainer').style.display = "block";
+	document.getElementById('audioinput').style.display = "block";
+	document.getElementById('removeaudio').style.display = "block";
+	
+}
+
+var input = document.querySelector('input');
+	input.addEventListener('change', playSelectedFile, true);
+
+function reloadRandomFrame() {
+	
+  if (!isNaN(video.duration)) {
+    var rand = Math.round(video.duration * 70) + 1;
+    video.currentTime = video.currentTime + widthcan;
+  }
+}
+var vid = document.getElementById("volumeRange");
+
+function volume(e)
+{
+	var vid = document.getElementById("video");
+	var aud = document.getElementById("audio");
+	vid.currentTime = $("#volumeRange").val();
+	$("#progress-bar").attr("value",vid.currentTime);
+	$("#volumeRange").attr("value",vid.currentTime);
+	//alert($('.noUi-handle-upper').attr('aria-valuenow'));
+	if(audio.src !== ""){
+		aud.currentTime = Math.abs((vid.currentTime / aud.duration) - aud.duration);
+	}
+	//var aud = document.getElementById("audio");
+	//alert(aud.currentTime);
+	
+}
+vid.addEventListener('input', volume);
+
+
+$(document).ready(function(){
+	var vid = document.getElementById("video");
+	$('video').wrap('<div class="video-container"></div>');
+	$('.video-container').append('<div class="video-filter" style="background-color: rgba(255, 255, 255, 0);"></div><br/>')
+	
+	$('.volumecontainer').append('<div style="padding-top:15px; display:none;" id="filtercolor" class="row"><div class="columnn green color" data-color-filter="rgba(0,255,0,.3)" id="green"><h2>green</h2> </div>  <div class="column red color" data-color-filter="rgba(255,0,0,.3)" id="red">    <h2>red</h2>	  </div>  <div class="column blue color" data-color-filter="rgba(0,0,255,.3)" id="blue">    <h2>blue</h2>		 </div>  <div class="column yellow color" data-color-filter="rgba(255,255,0,.3)" id="yellow">    <h2>yellow</h2> </div><div class="column clear color" data-color-filter="rgba(255,255,255,0)"" id="clear">    <h2>clear</h2> </div></div><div class="video-filter" style="background-color: rgba(255, 255, 255, 0);"></div><br/>')
+	
+	$('.row .color').on('click',function(){
+		filter_val = $(this).attr('data-color-filter');
+		$('.video-container .video-filter').css('background-color', filter_val);
+	});
+});
+
+var fileURL="";
+//Audio Js
+ var playAudioFile = function(event) {
+	//x = -1;
+	//y = 0;
+	var vid = document.getElementById("video");
+	var file = this.files[0];
+	//vid.pause();
+	//if(fileURL == "" ){
+		fileURL = URL.createObjectURL(file);
+		//try{
+			audio.src = fileURL;
+		//}catch(e){
+			//console.log(e);
+		//}
+		
+	//}
+	//vid.play();
+	vid.muted = true;
+
+}
+
+var audioinput = document.getElementById('audioinput');
+	audioinput.addEventListener('change', playAudioFile, true);
+  
+var vid = document.getElementById("video");
+/*$('#removeaudio').on('click',function(){
+		audio.src = "";
+		vid.muted = false;
+	});*/
+	
+
+/*
+ IONrangeSlider
+ */
+var fromOld = 0;
+var vid = document.getElementById('video');
+var toOld = vid.duration;
+var slider;
+function setIONrangeSlider(){
+
+  var slider = document.getElementById('range');
+	if (slider.noUiSlider) {
+        // throw new Error('Slider was already initialized.');
+        slider.noUiSlider.destroy();
+    }
+  noUiSlider.create(slider, {
+    start: [ 0, vid.duration ], // Handle start position
+    step: 1, // Slider moves in increments of '1'
+    margin: 3, // Handles must be more than '3' apart
+    connect: true, // Display a colored bar between the handles
+    behaviour: 'tap-drag', // Move handle on tap, bar is draggable
+    range: { // Slider can select '0' to 'duration'
+      'min': 0,
+      'max': vid.duration
+    }
+  });
+  
+	var valueInput = document.getElementById('value-input'),
+    valueSpan = document.getElementById('value-span');
+	var readValue;
+  
+	slider.noUiSlider.on('update', function( values, handle ) {
+	checkDomainAndStop();
+	
+    if ( handle ) {
+      readValue = values[handle] | 0;
+      valueSpan.innerHTML = toHHMMSS(values[handle]);
+
+      if(toOld != readValue){
+        toOld = readValue;
+      }
+
+    } else {
+      readValue = values[handle] | 0;
+      valueInput.innerHTML = toHHMMSS(values[handle]);
+
+      if(fromOld != readValue){
+        fromOld = readValue;
+        vid.currentTime = readValue;
+       // vid.pause();
+       // vid.play();
+      }
+    }
+  });
+
+  // When the input changes, set the slider value
+/*  valueInput.addEventListener('change', function(){
+    slider.noUiSlider.set([null, this.value]);
+  });*/
+
+}
+
+
+/*
+ Player Bar
+ *//*
+function updatePlayerBar(){
+  var curTime = vid.currentTime;
+  let duration = vid.duration;
+  let fromOld = $('.noUi-handle-lower').attr('aria-valuenow');
+  let toOld = $('.noUi-handle-upper').attr('aria-valuenow');
+  var cutLeft = fromOld * 100 / duration;
+  var cutRigth = toOld * 100 / duration;
+ // var cutRigth = (duration-toOld) * 100 / duration;
+
+  var played = (curTime - fromOld) * 100 / duration;
+
+  //var toPlay = 100 -played -cutLeft -cutRigth;
+//alert(1);
+
+  document.getElementById("progress-barleft").style.width = cutLeft + "%";
+  document.getElementById("progress-barright").style.width = cutRigth + "%";
+ // document.getElementById("played").style.width = played + "%";
+  //document.getElementById("toPlay").style.width = toPlay + "%";
+}
+*/
+/*
+ Player Bar
+ */
+ var vid = document.getElementById("video");
+
+ //var duration = vid.duration;
+// var fromOld = 0;
+var toOld = vid.duration;
+
+function updatePlayerBar(){
+  var curTime = vid.currentTime;
+  //var toOld = vid.duration;
+	//alert(1);
+	var duration = vid.duration;
+  var cutLeft = fromOld * 100 / duration;
+  var cutRigth = (duration-toOld) * 100 / duration;
+
+  var played = (curTime - fromOld) * 100 / duration;
+
+  var toPlay = 100 -played -cutLeft -cutRigth;
+							
+//	alert(fromOld);
+  document.getElementById("cut-left").style.width = cutLeft + "%";
+  document.getElementById("cut-right").style.width = cutRigth + "%";
+  document.getElementById("played").style.width = played + "%";
+  document.getElementById("toPlay").style.width = toPlay + "%";
+}
+
+
+function checkDomainAndStop(){
+	var vid = document.getElementById("video");
+	var curTime = vid.currentTime;
+	//document.getElementById('curTime').innerHTML=toHHMMSS(curTime.toString()) + " / " + toHHMMSS(duration.toString()) ;
+	// var result = toHHMMSS((toOld - fromOld).toString());
+	// if(result != "NaN:NaN:NaN"){
+	//   document.getElementById('finalDuration').innerHTML = result;
+	// }
+	// alert(fromOld);
+	if(curTime < fromOld){
+		vid.currentTime = fromOld;
+	}
+	if(curTime > toOld){
+  
+	var aud = document.getElementById("audio");
+	vid.currentTime = toOld;
+	// vid.seekTo(toOld, true);
+   
+		vid.pause();
+		aud.pause();
+	document.getElementById('playPause').innerHTML =
+      "<i class=\"separa icon-play\"></i>";
+  }
+
+  updatePlayerBar();
+
+  // recursively call it.
+  setTimeout(checkDomainAndStop, 100);
+}
+
+
+/*
+ converts String to hh:mm:ss or mm:ss
+ */
+function toHHMMSS(val) {
+  var sec_num = parseInt(val, 10);
+  var hours   = Math.floor(sec_num / 3600);
+  var minutes = Math.floor((sec_num - (hours * 3600)) / 60);
+  var seconds = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (seconds < 10) {seconds = "0"+seconds;}
+
+  // only mm:ss
+  if (hours == "00"){
+    var time = minutes+':'+seconds;
+  }
+  else{
+    var time = hours+':'+minutes+':'+seconds;
+  }
+
+  return time;
+}
+
+/*
+Controls Javscript
+*/
+var player = document.getElementById("video");
+var playeraud = document.getElementById("audio");
+/*function stopVideo() {
+  player.pause();
+
+}*/
+function pauseVideo() {
+  player.pause();
+  playeraud.pause();
+}
+
+function playVideo() {
+  player.play();
+  playeraud.play();
+}
+
+function playPauseVideo() {
+  //is playing
+ // alert(!player.paused);
+  if(!player.paused){
+	//console.log(player.paused);
+    pauseVideo();
+	 document.getElementById('playPause').innerHTML =
+      "<i class=\"separa icon-play\"></i>";
+	
+  }
+  else{
+    playVideo();
+	  document.getElementById('playPause').innerHTML =
+      "<i class=\"separa icon-pause\"></i>";
+  }
+}
+
+/*function setCorrectImageOnPlay(){
+  //is playing
+  if(!player.paused){
+    document.getElementById('playPause').innerHTML =
+      "<i class=\"separa icon-pause\"></i>";
+  }
+  else{
+    document.getElementById('playPause').innerHTML =
+      "<i class=\"separa icon-play\"></i>";
+  }
+}*/
+
+function backwardVideo() {
+  var curTime = player.currentTime;
+  curTime -= 10;
+  if(curTime < fromOld){
+    player.currentTime = fromOld;
+  }
+  else{
+    player.currentTime = curTime;
+  }
+}
+
+/*function rewindVideo() {
+  player.seekTo(fromOld, true);
+  playVideo();
+}*/
+
+
+function forwardVideo() {
+  var curTime = player.currentTime;
+
+  curTime+=10;
+  if(curTime > toOld){
+    player.currentTime = toOld;
+  }
+  else{
+    player.currentTime = curTime;
+  }
+}
+
+</script>
+
+</body>
+
+</html>
